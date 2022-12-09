@@ -1,0 +1,34 @@
+alias: 'Away Light: Living Room'
+description: ''
+trigger:
+  - platform: numeric_state
+    entity_id: sun.sun
+    below: '-2.0'
+    attribute: elevation
+  - platform: time
+    at: '22:00:00'
+condition:
+  - condition: state
+    entity_id: input_boolean.manual_override
+    state: 'off'
+  - condition: state
+    entity_id: switch.away_lighting
+    state: 'on'
+action:
+  - choose:
+      - conditions:
+          - condition: time
+            before: '22:00:00'
+        sequence:
+          - service: light.turn_on
+            target:
+              entity_id: light.living_room_wall_lights
+            data: {}
+    default:
+      - delay:
+          minutes: '{{ range(0,30) | random }}'
+      - service: light.turn_off
+        target:
+          entity_id: light.living_room_wall_lights
+        data: {}
+mode: single
